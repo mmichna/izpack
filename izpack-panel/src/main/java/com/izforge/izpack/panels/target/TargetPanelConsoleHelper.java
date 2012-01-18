@@ -21,18 +21,17 @@
 
 package com.izforge.izpack.panels.target;
 
-import com.izforge.izpack.api.data.AutomatedInstallData;
-import com.izforge.izpack.api.data.ResourceManager;
-import com.izforge.izpack.api.substitutor.VariableSubstitutor;
-import com.izforge.izpack.installer.console.PanelConsole;
-import com.izforge.izpack.installer.console.PanelConsoleHelper;
-import com.izforge.izpack.panels.path.PathInputPanel;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.Properties;
+
+import com.izforge.izpack.api.data.AutomatedInstallData;
+import com.izforge.izpack.api.data.ResourceManager;
+import com.izforge.izpack.installer.console.PanelConsole;
+import com.izforge.izpack.installer.console.PanelConsoleHelper;
+import com.izforge.izpack.panels.path.PathInputPanel;
 
 /**
  * The Target panel console helper class.
@@ -41,13 +40,6 @@ import java.util.Properties;
  */
 public class TargetPanelConsoleHelper extends PanelConsoleHelper implements PanelConsole
 {
-    private VariableSubstitutor variableSubstitutor;
-
-    public TargetPanelConsoleHelper(VariableSubstitutor variableSubstitutor)
-    {
-        this.variableSubstitutor = variableSubstitutor;
-    }
-
     public boolean runGeneratePropertiesFile(AutomatedInstallData installData, PrintWriter printWriter)
     {
         printWriter.println(AutomatedInstallData.INSTALL_PATH + "=");
@@ -66,7 +58,7 @@ public class TargetPanelConsoleHelper extends PanelConsoleHelper implements Pane
         {
             try
             {
-                strTargetPath = variableSubstitutor.substitute(strTargetPath);
+                strTargetPath = getVariableSubstitutor(installData).substitute(strTargetPath);
             }
             catch (Exception e)
             {
@@ -82,7 +74,7 @@ public class TargetPanelConsoleHelper extends PanelConsoleHelper implements Pane
 
         ResourceManager resourceManager = ResourceManager.getInstance();
         String strDefaultPath = PathInputPanel.loadDefaultInstallDir(
-                resourceManager, variableSubstitutor, idata);
+                resourceManager, getVariableSubstitutor(idata), idata);
 
         String strTargetPath = "";
 
@@ -108,7 +100,7 @@ public class TargetPanelConsoleHelper extends PanelConsoleHelper implements Pane
 
         try
         {
-            strTargetPath = variableSubstitutor.substitute(strTargetPath);
+            strTargetPath = getVariableSubstitutor(idata).substitute(strTargetPath);
         }
         catch (Exception e)
         {

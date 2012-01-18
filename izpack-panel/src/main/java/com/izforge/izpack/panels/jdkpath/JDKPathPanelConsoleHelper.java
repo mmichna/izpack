@@ -21,19 +21,26 @@
 
 package com.izforge.izpack.panels.jdkpath;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Properties;
+import java.util.Set;
+import java.util.StringTokenizer;
+
 import com.coi.tools.os.win.MSWinConstants;
 import com.izforge.izpack.api.data.AutomatedInstallData;
 import com.izforge.izpack.api.exception.NativeLibException;
-import com.izforge.izpack.api.substitutor.VariableSubstitutor;
 import com.izforge.izpack.core.os.RegistryDefaultHandler;
 import com.izforge.izpack.core.os.RegistryHandler;
 import com.izforge.izpack.installer.console.PanelConsole;
 import com.izforge.izpack.installer.console.PanelConsoleHelper;
 import com.izforge.izpack.util.FileExecutor;
 import com.izforge.izpack.util.OsVersion;
-
-import java.io.*;
-import java.util.*;
 
 /**
  * The Target panel console helper class.
@@ -46,12 +53,6 @@ public class JDKPathPanelConsoleHelper extends PanelConsoleHelper implements Pan
     private String maxVersion;
     private String variableName;
     private String detectedVersion;
-    private VariableSubstitutor variableSubstitutor;
-
-    public JDKPathPanelConsoleHelper(VariableSubstitutor variableSubstitutor)
-    {
-        this.variableSubstitutor = variableSubstitutor;
-    }
 
     public boolean runGeneratePropertiesFile(AutomatedInstallData installData, PrintWriter printWriter)
     {
@@ -71,7 +72,7 @@ public class JDKPathPanelConsoleHelper extends PanelConsoleHelper implements Pan
         {
             try
             {
-                strTargetPath = variableSubstitutor.substitute(strTargetPath);
+                strTargetPath = getVariableSubstitutor(installData).substitute(strTargetPath);
             }
             catch (Exception e)
             {
