@@ -21,10 +21,25 @@
 
 package com.izforge.izpack.installer.automation;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeMap;
+
 import com.izforge.izpack.api.adaptator.IXMLElement;
 import com.izforge.izpack.api.adaptator.IXMLParser;
 import com.izforge.izpack.api.adaptator.impl.XMLParser;
-import com.izforge.izpack.api.data.*;
+import com.izforge.izpack.api.container.BindeableContainer;
+import com.izforge.izpack.api.data.AutomatedInstallData;
+import com.izforge.izpack.api.data.DynamicInstallerRequirementValidator;
+import com.izforge.izpack.api.data.Info;
+import com.izforge.izpack.api.data.LocaleDatabase;
+import com.izforge.izpack.api.data.Panel;
+import com.izforge.izpack.api.data.ResourceManager;
+import com.izforge.izpack.api.data.ScriptParserConstant;
 import com.izforge.izpack.api.exception.InstallerException;
 import com.izforge.izpack.api.handler.AbstractUIHandler;
 import com.izforge.izpack.api.installer.DataValidator;
@@ -35,6 +50,7 @@ import com.izforge.izpack.core.substitutor.VariableSubstitutorImpl;
 import com.izforge.izpack.data.PanelAction;
 import com.izforge.izpack.installer.base.InstallerBase;
 import com.izforge.izpack.installer.console.ConsolePanelAutomationHelper;
+import com.izforge.izpack.installer.container.impl.InstallerContainer.HasInstallerContainer;
 import com.izforge.izpack.installer.data.UninstallDataWriter;
 import com.izforge.izpack.installer.language.ConditionCheck;
 import com.izforge.izpack.installer.manager.DataValidatorFactory;
@@ -42,14 +58,6 @@ import com.izforge.izpack.installer.manager.PanelActionFactory;
 import com.izforge.izpack.util.Debug;
 import com.izforge.izpack.util.Housekeeper;
 import com.izforge.izpack.util.OsConstraintHelper;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeMap;
 
 /**
  * Runs the install process in text only (no GUI) mode.
@@ -87,6 +95,8 @@ public class AutomatedInstaller extends InstallerBase
     private UninstallDataWriter uninstallDataWriter;
     private VariableSubstitutor variableSubstitutor;
 
+	private final BindeableContainer installerContainer;
+
     /**
      * Constructing an instance triggers the install.
      *
@@ -94,11 +104,12 @@ public class AutomatedInstaller extends InstallerBase
      * @param resourceManager
      * @throws Exception Description of the Exception
      */
-    public AutomatedInstaller(ResourceManager resourceManager, ConditionCheck checkCondition, UninstallDataWriter uninstallDataWriter, VariableSubstitutor variableSubstitutor)
+    public AutomatedInstaller(ResourceManager resourceManager, ConditionCheck checkCondition, UninstallDataWriter uninstallDataWriter, VariableSubstitutor variableSubstitutor, BindeableContainer installerContainer)
     {
         super(resourceManager);
         this.checkCondition = checkCondition;
         this.uninstallDataWriter = uninstallDataWriter;
+		this.installerContainer = installerContainer;
 
         this.panelInstanceCount = new TreeMap<String, Integer>();
         this.variableSubstitutor = variableSubstitutor;
@@ -356,6 +367,9 @@ public class AutomatedInstaller extends InstallerBase
             }
         }
 
+        if (automationHelperInstance instanceof HasInstallerContainer) {
+        	((HasInstallerContainer) automationHelperInstance).setInstallerContainer(installerContainer);
+        }
         return automationHelperInstance;
     }
 

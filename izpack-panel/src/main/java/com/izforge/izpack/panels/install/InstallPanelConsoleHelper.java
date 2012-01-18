@@ -21,15 +21,17 @@
 
 package com.izforge.izpack.panels.install;
 
+import java.io.PrintWriter;
+import java.util.Properties;
+
+import com.izforge.izpack.api.container.BindeableContainer;
 import com.izforge.izpack.api.data.AutomatedInstallData;
 import com.izforge.izpack.api.handler.AbstractUIHandler;
 import com.izforge.izpack.api.handler.AbstractUIProgressHandler;
 import com.izforge.izpack.installer.console.PanelConsole;
 import com.izforge.izpack.installer.console.PanelConsoleHelper;
+import com.izforge.izpack.installer.container.impl.InstallerContainer.HasInstallerContainer;
 import com.izforge.izpack.installer.unpacker.IUnpacker;
-
-import java.io.PrintWriter;
-import java.util.Properties;
 
 /**
  * Install Panel console helper
@@ -37,9 +39,10 @@ import java.util.Properties;
  * @author Mounir el hajj
  */
 public class InstallPanelConsoleHelper extends PanelConsoleHelper implements PanelConsole,
-        AbstractUIProgressHandler
+        AbstractUIProgressHandler, HasInstallerContainer
 {
 
+	private BindeableContainer installerContainer;
     private int noOfPacks = 0;
 
 
@@ -55,11 +58,8 @@ public class InstallPanelConsoleHelper extends PanelConsoleHelper implements Pan
 
     public boolean runConsole(AutomatedInstallData idata)
     {
-
-        //REFACTOR : Use container to get unpacker
-//        IUnpacker unpacker = UnpackerFactory.getUnpacker(idata.getInfo().getUnpackerClassName(), idata, this);
-//                this);
-        IUnpacker unpacker = null;
+        IUnpacker unpacker = installerContainer.getComponent(IUnpacker.class);
+        unpacker.setHandler(this);
         Thread unpackerthread = new Thread(unpacker, "IzPack - Unpacker thread");
         unpacker.setRules(idata.getRules());
         unpackerthread.start();
@@ -143,4 +143,14 @@ public class InstallPanelConsoleHelper extends PanelConsoleHelper implements Pan
     {
 
     }
+
+	@Override
+	public BindeableContainer getInstallerContainer() {
+		return installerContainer;
+	}
+
+	@Override
+	public void setInstallerContainer(BindeableContainer installerContainer) {
+		this.installerContainer = installerContainer;
+	}
 }

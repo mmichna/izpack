@@ -28,6 +28,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 
+import com.izforge.izpack.api.container.BindeableContainer;
 import com.izforge.izpack.api.data.AutomatedInstallData;
 import com.izforge.izpack.api.data.DynamicInstallerRequirementValidator;
 import com.izforge.izpack.api.data.Info;
@@ -43,6 +44,7 @@ import com.izforge.izpack.api.substitutor.VariableSubstitutor;
 import com.izforge.izpack.core.substitutor.VariableSubstitutorImpl;
 import com.izforge.izpack.installer.base.InstallerBase;
 import com.izforge.izpack.installer.bootstrap.Installer;
+import com.izforge.izpack.installer.container.impl.InstallerContainer.HasInstallerContainer;
 import com.izforge.izpack.installer.language.ConditionCheck;
 import com.izforge.izpack.installer.manager.DataValidatorFactory;
 import com.izforge.izpack.util.Debug;
@@ -68,7 +70,9 @@ public class ConsoleInstaller extends InstallerBase
     private ConditionCheck checkCondition;
     private VariableSubstitutor variableSubstitutor;
 
-    public ConsoleInstaller(AutomatedInstallData installdata, RulesEngine rules, ResourceManager resourceManager, ConditionCheck checkCondition) throws Exception
+	private final BindeableContainer installerContainer;
+
+    public ConsoleInstaller(AutomatedInstallData installdata, RulesEngine rules, ResourceManager resourceManager, ConditionCheck checkCondition, BindeableContainer installerContainer) throws Exception
 
     {
         super(resourceManager);
@@ -76,6 +80,8 @@ public class ConsoleInstaller extends InstallerBase
         this.checkCondition = checkCondition;
         this.installdata = installdata;
         this.rules = rules;
+		this.installerContainer = installerContainer;
+
         // Fallback: choose the first listed language pack if not specified via commandline
         if (this.installdata.getLocaleISO3() == null)
         {
@@ -119,49 +125,18 @@ public class ConsoleInstaller extends InstallerBase
             for (Panel panel : this.installdata.getPanelsOrder())
             {
                 this.installdata.setCurPanelNumber(this.installdata.getCurPanelNumber() + 1);
-                String praefix = "com.izforge.izpack.panels.";
-                if (panel.className.contains("."))
-                {
-                    praefix = "";
-                }
+
                 if (!OsConstraintHelper.oneMatchesCurrentSystem(panel.getOsConstraints()))
                 {
                     continue;
                 }
-                String panelClassName = panel.className;
-                String consoleHelperClassName = praefix + panelClassName + "ConsoleHelper";
-                Class<PanelConsole> consoleHelperClass = null;
 
-                Debug.log("ConsoleHelper:" + consoleHelperClassName);
-                try
-                {
-                    consoleHelperClass = (Class<PanelConsole>) Class
-                            .forName(consoleHelperClassName);
-                }
-                catch (ClassNotFoundException e)
-                {
-                    Debug.log("ClassNotFoundException-skip :" + consoleHelperClassName);
-                    continue;
-                }
-                PanelConsole consoleHelperInstance = null;
-                if (consoleHelperClass != null)
-                {
-                    try
-                    {
-                        Debug.log("Instantiate :" + consoleHelperClassName);
-                        consoleHelperInstance = consoleHelperClass.newInstance();
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.log("ERROR: no default constructor for " + consoleHelperClassName
-                                + ", skipping...");
-                        continue;
-                    }
-                }
+                PanelConsole consoleHelperInstance = getPanelConsoleHelper(panel);
 
                 //Check to see if we can show the panel based on its conditions.
                 if ((consoleHelperInstance != null) && (canShow(panel)))
                 {
+                	String consoleHelperClassName = consoleHelperInstance.getClass().getName();
                     try
                     {
                         Debug.log("consoleHelperInstance." + strAction + ":"
@@ -216,7 +191,7 @@ public class ConsoleInstaller extends InstallerBase
                     }
                     catch (Exception e)
                     {
-                        Debug.log("ERROR: console installation failed for panel " + panelClassName);
+                        Debug.log("ERROR: console installation failed for panel " + panel.className);
                         e.printStackTrace();
                         this.result = false;
                     }
@@ -245,7 +220,50 @@ public class ConsoleInstaller extends InstallerBase
 
     }
 
-    protected void doInstall() throws Exception
+    private PanelConsole getPanelConsoleHelper(Panel panel) {
+        String prefix = "com.izforge.izpack.panels.";
+        if (panel.className.contains("."))
+        {
+            prefix = "";
+        }
+
+    	String panelClassName = panel.className;
+        String consoleHelperClassName = prefix + panelClassName + "ConsoleHelper";
+        Class<PanelConsole> consoleHelperClass = null;
+
+        Debug.log("ConsoleHelper:" + consoleHelperClassName);
+        try
+        {
+            consoleHelperClass = (Class<PanelConsole>) Class
+                    .forName(consoleHelperClassName);
+        }
+        catch (ClassNotFoundException e)
+        {
+            Debug.log("ClassNotFoundException-skip :" + consoleHelperClassName);
+        }
+        PanelConsole consoleHelperInstance = null;
+        if (consoleHelperClass != null)
+        {
+            try
+            {
+                Debug.log("Instantiate :" + consoleHelperClassName);
+                consoleHelperInstance = consoleHelperClass.newInstance();
+            }
+            catch (Exception e)
+            {
+                Debug.log("ERROR: no default constructor for " + consoleHelperClassName
+                        + ", skipping...");
+
+            }
+        }
+
+        if (consoleHelperInstance instanceof HasInstallerContainer) {
+        	((HasInstallerContainer) consoleHelperInstance).setInstallerContainer(installerContainer);
+        }
+        return consoleHelperInstance;
+	}
+
+	protected void doInstall() throws Exception
     {
         try
         {

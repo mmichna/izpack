@@ -1,5 +1,16 @@
 package com.izforge.izpack.installer.container.impl;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.util.Properties;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+
+import org.picocontainer.Characteristics;
+import org.picocontainer.MutablePicoContainer;
+import org.picocontainer.injectors.ProviderAdapter;
+
 import com.izforge.izpack.api.container.BindeableContainer;
 import com.izforge.izpack.api.data.AutomatedInstallData;
 import com.izforge.izpack.api.data.ResourceManager;
@@ -25,13 +36,6 @@ import com.izforge.izpack.installer.language.LanguageDialog;
 import com.izforge.izpack.installer.manager.PanelManager;
 import com.izforge.izpack.installer.unpacker.IUnpacker;
 import com.izforge.izpack.merge.MergeManagerImpl;
-import org.picocontainer.Characteristics;
-import org.picocontainer.MutablePicoContainer;
-import org.picocontainer.injectors.ProviderAdapter;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.Properties;
 
 /**
  * Application Component. <br />
@@ -138,4 +142,10 @@ public class InstallerContainer extends AbstractContainer
         return message;
     }
 
+    public interface HasInstallerContainer {
+
+    	BindeableContainer getInstallerContainer();
+
+    	void setInstallerContainer(BindeableContainer installerContainer);
+    }
 }
