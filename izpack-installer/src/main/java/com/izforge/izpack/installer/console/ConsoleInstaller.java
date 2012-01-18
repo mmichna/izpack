@@ -110,6 +110,8 @@ public class ConsoleInstaller extends InstallerBase
         }
         Debug.log("[ Starting console installation ] " + strAction);
 
+        VariableSubstitutorImpl substitutor = new VariableSubstitutorImpl(this.installdata.getVariables());
+		refreshDynamicVariables(this.installdata, substitutor);
         try
         {
             this.result = true;
@@ -221,8 +223,7 @@ public class ConsoleInstaller extends InstallerBase
 
                 }
 
-                refreshDynamicVariables(this.installdata,
-                        new VariableSubstitutorImpl(this.installdata.getVariables()));
+                refreshDynamicVariables(this.installdata, substitutor);
             }
 
             if (this.result)
