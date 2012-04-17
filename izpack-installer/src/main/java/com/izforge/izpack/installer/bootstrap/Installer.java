@@ -180,6 +180,7 @@ public class Installer
                 break;
 
             case INSTALLER_CONSOLE:
+            	System.setProperty("java.awt.headless", "true");
                 initContainer();
                 ConsoleInstaller consoleInstaller = applicationComponent.getComponent(ConsoleInstaller.class);
                 consoleInstaller.setLangCode(langcode);

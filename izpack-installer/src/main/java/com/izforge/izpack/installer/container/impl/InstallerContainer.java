@@ -87,9 +87,14 @@ public class InstallerContainer extends AbstractContainer
         }
         pico
                 // Configuration of title parameter in InstallerFrame
-                .addConfig("title", getTitle(installdata, substitutor))
-                        // Configuration of frame parameter in languageDialog
-                .addConfig("frame", initFrame());
+                .addConfig("title", getTitle(installdata, substitutor));
+
+        String headless = System.getProperty("java.awt.headless");
+		if (headless == null || headless.equals("false")) {
+			// Configuration of frame parameter in languageDialog
+			pico.addConfig("frame", initFrame());
+        }
+
         pico
                 .addComponent(IUnpacker.class, unpackerclass)
                 .addComponent(InstallerFrame.class)
