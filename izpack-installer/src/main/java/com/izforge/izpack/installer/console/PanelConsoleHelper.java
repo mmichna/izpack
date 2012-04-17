@@ -26,15 +26,19 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import com.izforge.izpack.api.data.AutomatedInstallData;
+import com.izforge.izpack.api.handler.AbstractUIHandler;
 import com.izforge.izpack.api.substitutor.VariableSubstitutor;
 import com.izforge.izpack.core.substitutor.VariableSubstitutorImpl;
+import com.izforge.izpack.installer.automation.PanelAutomationHelper;
+import com.izforge.izpack.util.Housekeeper;
 
 /**
  * Abstract class implementing basic functions needed by all panel console helpers.
  *
+ * @see PanelAutomationHelper
  * @author Mounir El Hajj
  */
-abstract public class PanelConsoleHelper {
+abstract public class PanelConsoleHelper implements AbstractUIHandler {
 
 	private VariableSubstitutor variableSubstitutor;
 
@@ -64,5 +68,56 @@ abstract public class PanelConsoleHelper {
 	protected final VariableSubstitutor getVariableSubstitutor(AutomatedInstallData installData) {
 		if (variableSubstitutor == null) variableSubstitutor = new VariableSubstitutorImpl(installData.getVariables());
 		return variableSubstitutor;
+	}
+
+	/**
+	 * @see com.izforge.izpack.api.handler.AbstractUIHandler#emitNotification(java.lang.String)
+	 */
+	public void emitNotification(String message) {
+		System.out.println(message);
+	}
+
+	/**
+	 * @see com.izforge.izpack.api.handler.AbstractUIHandler#emitWarning(java.lang.String, java.lang.String)
+	 */
+	public boolean emitWarning(String title, String message) {
+		System.err.println("[ WARNING: " + formatTitle(title) + message + " ]");
+		// default: continue
+		return true;
+	}
+
+	/**
+	 * @see com.izforge.izpack.api.handler.AbstractUIHandler#emitError(java.lang.String, java.lang.String)
+	 */
+	public void emitError(String title, String message) {
+		System.err.println("[ ERROR: " + formatTitle(title) + message + " ]");
+	}
+
+	private String formatTitle(String title) {
+		if (title == null || title.isEmpty()) return "";
+		return title + ": ";
+	}
+
+	/**
+	 * @see com.izforge.izpack.api.handler.AbstractUIHandler#emitErrorAndBlockNext(java.lang.String, java.lang.String)
+	 */
+	public void emitErrorAndBlockNext(String title, String message) {
+		emitError(title, message);
+		Housekeeper.getInstance().shutDown(10);
+	}
+
+	/**
+	 * @see com.izforge.izpack.api.handler.AbstractUIHandler#askQuestion(java.lang.String, java.lang.String, int)
+	 */
+	public int askQuestion(String title, String question, int choices) {
+		// don't know what to answer
+		return AbstractUIHandler.ANSWER_CANCEL;
+	}
+
+	/**
+	 * @see com.izforge.izpack.api.handler.AbstractUIHandler#askQuestion(java.lang.String, java.lang.String, int, int)
+	 */
+	public int askQuestion(String title, String question, int choices, int default_choice) {
+		return default_choice;
 	}
 }

@@ -304,7 +304,11 @@ public class ProcessPanelWorker implements Runnable
 
         for (ProcessPanelWorker.ProcessingJob processingJob : this.jobs)
         {
-            this.handler.startProcess(processingJob.name);
+        	String jobMessageKey = ProcessPanel.class.getSimpleName() + ".job." + processingJob.name;
+			String jobName = idata.getLangpack().getString(jobMessageKey);
+        	if (jobName == jobMessageKey) jobName = processingJob.name;
+
+            this.handler.startProcess(jobName);
 
             this.result = processingJob.run(this.handler, this.vs);
 
