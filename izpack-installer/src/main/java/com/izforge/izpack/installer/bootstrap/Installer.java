@@ -21,17 +21,17 @@
 
 package com.izforge.izpack.installer.bootstrap;
 
+import java.awt.GraphicsEnvironment;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 import com.izforge.izpack.installer.automation.AutomatedInstaller;
 import com.izforge.izpack.installer.console.ConsoleInstaller;
 import com.izforge.izpack.installer.container.impl.InstallerContainer;
 import com.izforge.izpack.util.Debug;
 import com.izforge.izpack.util.StringTool;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.awt.GraphicsEnvironment;
 
 /**
  * The program entry point. Selects between GUI and text install modes.
@@ -42,17 +42,18 @@ public class Installer
 {
 
     public static final int INSTALLER_GUI = 0, INSTALLER_AUTO = 1, INSTALLER_CONSOLE = 2;
-    public static final int CONSOLE_INSTALL = 0, CONSOLE_GEN_TEMPLATE = 1, CONSOLE_FROM_TEMPLATE = 2,
-            CONSOLE_FROM_SYSTEMPROPERTIES = 3, CONSOLE_FROM_SYSTEMPROPERTIESMERGE = 4;
+
+    public static final int CONSOLE_INSTALL = 0, CONSOLE_GEN_TEMPLATE = 1,
+            CONSOLE_FROM_TEMPLATE = 2, CONSOLE_FROM_SYSTEMPROPERTIES = 3,
+            CONSOLE_FROM_SYSTEMPROPERTIESMERGE = 4;
 
     private InstallerContainer applicationComponent;
 
-
     /*
-    * The main method (program entry point).
-    *
-    * @param args The arguments passed on the command-line.
-    */
+     * The main method (program entry point).
+     *
+     * @param args The arguments passed on the command-line.
+     */
 
     public static void main(String[] args)
     {
@@ -73,7 +74,6 @@ public class Installer
         applicationComponent = new InstallerContainer();
         applicationComponent.initBindings();
     }
-
 
     private void start(String[] args)
     {
@@ -158,34 +158,37 @@ public class Installer
         }
     }
 
-    private void launchInstall(int type, int consoleAction, String path, String langcode) throws Exception
+    private void launchInstall(int type, int consoleAction, String path, String langcode)
+            throws Exception
     {
         // if headless, just use the console mode
-        if (type == INSTALLER_GUI && GraphicsEnvironment.isHeadless()) 
+        if (type == INSTALLER_GUI && GraphicsEnvironment.isHeadless())
         {
             type = INSTALLER_CONSOLE;
         }
-        
+
         switch (type)
         {
-            case INSTALLER_GUI:
-                InstallerGui.run();
-                break;
+        case INSTALLER_GUI:
+            InstallerGui.run();
+            break;
 
-            case INSTALLER_AUTO:
-                initContainer();
-                AutomatedInstaller automatedInstaller = applicationComponent.getComponent(AutomatedInstaller.class);
-                automatedInstaller.init(path);
-                automatedInstaller.doInstall();
-                break;
+        case INSTALLER_AUTO:
+            initContainer();
+            AutomatedInstaller automatedInstaller = applicationComponent
+                    .getComponent(AutomatedInstaller.class);
+            automatedInstaller.init(path);
+            automatedInstaller.doInstall();
+            break;
 
-            case INSTALLER_CONSOLE:
-            	System.setProperty("java.awt.headless", "true");
-                initContainer();
-                ConsoleInstaller consoleInstaller = applicationComponent.getComponent(ConsoleInstaller.class);
-                consoleInstaller.setLangCode(langcode);
-                consoleInstaller.run(consoleAction, path);
-                break;
+        case INSTALLER_CONSOLE:
+            System.setProperty("java.awt.headless", "true");
+            initContainer();
+            ConsoleInstaller consoleInstaller = applicationComponent
+                    .getComponent(ConsoleInstaller.class);
+            consoleInstaller.setLangCode(langcode);
+            consoleInstaller.run(consoleAction, path);
+            break;
         }
     }
 

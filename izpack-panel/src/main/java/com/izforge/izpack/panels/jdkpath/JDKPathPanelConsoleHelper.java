@@ -49,12 +49,17 @@ import com.izforge.izpack.util.OsVersion;
  */
 public class JDKPathPanelConsoleHelper extends PanelConsoleHelper implements PanelConsole
 {
+
     private String minVersion;
+
     private String maxVersion;
+
     private String variableName;
+
     private String detectedVersion;
 
-    public boolean runGeneratePropertiesFile(AutomatedInstallData installData, PrintWriter printWriter)
+    public boolean runGeneratePropertiesFile(AutomatedInstallData installData,
+            PrintWriter printWriter)
     {
         printWriter.println(AutomatedInstallData.INSTALL_PATH + "=");
         return true;
@@ -107,7 +112,8 @@ public class JDKPathPanelConsoleHelper extends PanelConsoleHelper implements Pan
         if (!pathIsValid(strDefaultPath) || !verifyVersion(minVersion, maxVersion, strDefaultPath))
         {
             strDefaultPath = resolveInRegistry(minVersion, maxVersion);
-            if (!pathIsValid(strDefaultPath) || !verifyVersion(minVersion, maxVersion, strDefaultPath))
+            if (!pathIsValid(strDefaultPath)
+                    || !verifyVersion(minVersion, maxVersion, strDefaultPath))
             {
                 strDefaultPath = "";
             }
@@ -142,13 +148,15 @@ public class JDKPathPanelConsoleHelper extends PanelConsoleHelper implements Pan
             }
             else if (!verifyVersion(minVersion, maxVersion, strPath))
             {
-                System.out.println("The chosen JDK has the wrong version (available: " + detectedVersion + " required: " + minVersion + " - " + maxVersion + ").");
+                System.out.println("The chosen JDK has the wrong version (available: "
+                        + detectedVersion + " required: " + minVersion + " - " + maxVersion + ").");
                 System.out.println("Continue anyway? [no]");
                 br = new BufferedReader(new InputStreamReader(System.in));
                 try
                 {
                     String strIn = br.readLine();
-                    if (strIn.trim().toLowerCase().equals("y") || strIn.trim().toLowerCase().equals("yes"))
+                    if (strIn.trim().toLowerCase().equals("y")
+                            || strIn.trim().toLowerCase().equals("yes"))
                     {
                         bKeepAsking = false;
                     }
@@ -184,8 +192,8 @@ public class JDKPathPanelConsoleHelper extends PanelConsoleHelper implements Pan
 
     /**
      * Returns whether the chosen path is true or not. If existFiles are not null, the existence of
-     * it under the chosen path are detected. This method can be also implemented in derived
-     * classes to handle special verification of the path.
+     * it under the chosen path are detected. This method can be also implemented in derived classes
+     * to handle special verification of the path.
      *
      * @return true if existFiles are exist or not defined, else false
      */
@@ -194,10 +202,7 @@ public class JDKPathPanelConsoleHelper extends PanelConsoleHelper implements Pan
         for (String existFile : JDKPathPanel.testFiles)
         {
             File path = new File(strPath, existFile).getAbsoluteFile();
-            if (!path.exists())
-            {
-                return false;
-            }
+            if (!path.exists()) { return false; }
         }
         return true;
     }
@@ -206,30 +211,21 @@ public class JDKPathPanelConsoleHelper extends PanelConsoleHelper implements Pan
     {
         boolean retval = true;
         // No min and max, version always ok.
-        if (min == null && max == null)
-        {
-            return (true);
-        }
+        if (min == null && max == null) { return (true); }
         // Now get the version ...
         // We cannot look to the version of this vm because we should
         // test the given JDK VM.
         String[] params;
         if (System.getProperty("os.name").contains("Windows"))
         {
-            String[] paramsp = {
-                    "cmd",
-                    "/c",
-                    path + File.separator + "bin" + File.separator + "java",
-                    "-version"
-            };
+            String[] paramsp = { "cmd", "/c",
+                    path + File.separator + "bin" + File.separator + "java", "-version"};
             params = paramsp;
         }
         else
         {
-            String[] paramsp = {
-                    path + File.separator + "bin" + File.separator + "java",
-                    "-version"
-            };
+            String[] paramsp = { path + File.separator + "bin" + File.separator + "java",
+                    "-version"};
             params = paramsp;
         }
         String[] output = new String[2];
@@ -254,8 +250,8 @@ public class JDKPathPanelConsoleHelper extends PanelConsoleHelper implements Pan
         return retval;
     }
 
-    private boolean compareVersions(String in, String template, boolean isMin,
-                                    int assumedPlace, int halfRange, String useNotIdentifier)
+    private boolean compareVersions(String in, String template, boolean isMin, int assumedPlace,
+            int halfRange, String useNotIdentifier)
     {
         StringTokenizer tokenizer = new StringTokenizer(in, " \t\n\r\f\"");
         int i;
@@ -306,10 +302,7 @@ public class JDKPathPanelConsoleHelper extends PanelConsoleHelper implements Pan
             // will be right here. Only if e.g. needed is 1.4.2_00 the
             // return value will be false, but zero should not b e used
             // at the last version part.
-            if (!currentTokenizer.hasMoreTokens())
-            {
-                return (false);
-            }
+            if (!currentTokenizer.hasMoreTokens()) { return (false); }
             String current = currentTokenizer.nextToken();
             String needed = neededTokenizer.nextToken();
             int currentValue = 0;
@@ -321,28 +314,22 @@ public class JDKPathPanelConsoleHelper extends PanelConsoleHelper implements Pan
             }
             catch (NumberFormatException nfe)
             { // A number format exception will be raised if
-                // there is a non numeric part in the version,
-                // e.g. 1.5.0_beta. The verification runs only into
-                // this deep area of version number (fourth sub place)
-                // if all other are equal to the given limit. Then
-                // it is right to return false because e.g.
-                // the minimal needed version will be 1.5.0.2.
+              // there is a non numeric part in the version,
+              // e.g. 1.5.0_beta. The verification runs only into
+              // this deep area of version number (fourth sub place)
+              // if all other are equal to the given limit. Then
+              // it is right to return false because e.g.
+              // the minimal needed version will be 1.5.0.2.
                 return (false);
             }
             if (currentValue < neededValue)
             {
-                if (isMin)
-                {
-                    return (false);
-                }
+                if (isMin) { return (false); }
                 return (true);
             }
             if (currentValue > neededValue)
             {
-                if (isMin)
-                {
-                    return (true);
-                }
+                if (isMin) { return (true); }
                 return (false);
             }
         }
@@ -371,28 +358,26 @@ public class JDKPathPanelConsoleHelper extends PanelConsoleHelper implements Pan
             // We are on a os which has no registry or the
             // needed dll was not bound to this installation. In
             // both cases we forget the try to get the JDK path from registry.
-            {
-                return (retval);
-            }
+            { return (retval); }
             oldVal = registryHandler.getRoot(); // Only for security...
             registryHandler.setRoot(MSWinConstants.HKEY_LOCAL_MACHINE);
             String[] keys = registryHandler.getSubkeys(JDKPathPanel.JDK_ROOT_KEY);
-            if (keys == null || keys.length == 0)
-            {
-                return (retval);
-            }
+            if (keys == null || keys.length == 0) { return (retval); }
             Arrays.sort(keys);
             int i = keys.length - 1;
             // We search for the highest allowd version, therefore retrograde
             while (i > 0)
             {
-                if (max == null || compareVersions(keys[i], max, false, 4, 4, "__NO_NOT_IDENTIFIER_"))
+                if (max == null
+                        || compareVersions(keys[i], max, false, 4, 4, "__NO_NOT_IDENTIFIER_"))
                 { // First allowed version found, now we have to test that the min value
-                    // also allows this version.
-                    if (min == null || compareVersions(keys[i], min, true, 4, 4, "__NO_NOT_IDENTIFIER_"))
+                  // also allows this version.
+                    if (min == null
+                            || compareVersions(keys[i], min, true, 4, 4, "__NO_NOT_IDENTIFIER_"))
                     {
                         String cv = JDKPathPanel.JDK_ROOT_KEY + "\\" + keys[i];
-                        String path = registryHandler.getValue(cv, JDKPathPanel.JDK_VALUE_NAME).getStringData();
+                        String path = registryHandler.getValue(cv, JDKPathPanel.JDK_VALUE_NAME)
+                                .getStringData();
                         // Use it only if the path is valid.
                         // Set the path for method pathIsValid ...
                         if (!pathIsValid(path))
@@ -410,7 +395,7 @@ public class JDKPathPanelConsoleHelper extends PanelConsoleHelper implements Pan
         }
         catch (Exception e)
         { // Will only be happen if registry handler is good, but an
-            // exception at performing was thrown. This is an error...
+          // exception at performing was thrown. This is an error...
             e.printStackTrace();
         }
         finally

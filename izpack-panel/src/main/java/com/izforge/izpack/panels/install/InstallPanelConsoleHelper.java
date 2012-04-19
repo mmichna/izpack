@@ -42,11 +42,12 @@ public class InstallPanelConsoleHelper extends PanelConsoleHelper implements Pan
         AbstractUIProgressHandler, HasInstallerContainer
 {
 
-	private BindeableContainer installerContainer;
+    private BindeableContainer installerContainer;
+
     private int noOfPacks = 0;
 
-
-    public boolean runGeneratePropertiesFile(AutomatedInstallData installData, PrintWriter printWriter)
+    public boolean runGeneratePropertiesFile(AutomatedInstallData installData,
+            PrintWriter printWriter)
     {
         return true;
     }
@@ -79,12 +80,13 @@ public class InstallPanelConsoleHelper extends PanelConsoleHelper implements Pan
 
     }
 
-
+    @Override
     public void emitNotification(String message)
     {
         System.out.println(message);
     }
 
+    @Override
     public boolean emitWarning(String title, String message)
     {
         System.err.println("[ WARNING: " + message + " ]");
@@ -92,22 +94,26 @@ public class InstallPanelConsoleHelper extends PanelConsoleHelper implements Pan
         return true;
     }
 
+    @Override
     public void emitError(String title, String message)
     {
         System.err.println("[ ERROR: " + message + " ]");
     }
 
+    @Override
     public void emitErrorAndBlockNext(String title, String message)
     {
         System.err.println("[ ERROR: " + message + " ]");
     }
 
+    @Override
     public int askQuestion(String title, String question, int choices)
     {
         // don't know what to answer
         return AbstractUIHandler.ANSWER_CANCEL;
     }
 
+    @Override
     public int askQuestion(String title, String question, int choices, int default_choice)
     {
         return default_choice;
@@ -144,13 +150,15 @@ public class InstallPanelConsoleHelper extends PanelConsoleHelper implements Pan
 
     }
 
-	@Override
-	public BindeableContainer getInstallerContainer() {
-		return installerContainer;
-	}
+    @Override
+    public BindeableContainer getInstallerContainer()
+    {
+        return installerContainer;
+    }
 
-	@Override
-	public void setInstallerContainer(BindeableContainer installerContainer) {
-		this.installerContainer = installerContainer;
-	}
+    @Override
+    public void setInstallerContainer(BindeableContainer installerContainer)
+    {
+        this.installerContainer = installerContainer;
+    }
 }

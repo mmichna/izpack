@@ -13,80 +13,105 @@ import com.izforge.izpack.installer.console.PanelConsole;
 import com.izforge.izpack.installer.console.PanelConsoleHelper;
 import com.izforge.izpack.installer.container.impl.InstallerContainer.HasInstallerContainer;
 
-public class ProcessPanelConsoleHelper extends PanelConsoleHelper implements PanelConsole, AbstractUIProcessHandler, HasInstallerContainer {
+public class ProcessPanelConsoleHelper extends PanelConsoleHelper implements PanelConsole,
+        AbstractUIProcessHandler, HasInstallerContainer
+{
 
-	private BindeableContainer installerContainer;
-	private int noOfJobs = 0;
-	private int currentJob = 0;
+    private BindeableContainer installerContainer;
 
-	@Override
-	public boolean runGeneratePropertiesFile(AutomatedInstallData installData, PrintWriter printWriter) {
-		return true;
-	}
+    private int noOfJobs = 0;
 
-	@Override
-	public boolean runConsoleFromProperties(AutomatedInstallData installData, Properties p) {
-		return runConsole(installData);
-	}
+    private int currentJob = 0;
 
-	@Override
-	public boolean runConsole(AutomatedInstallData installData) {
-		ProcessPanelWorker worker = createWorker(installData);
-		worker.run();
-		if (!worker.getResult()) throw new RuntimeException("The work done by the ProcessPanel failed");
-		return true;
-	}
+    @Override
+    public boolean runGeneratePropertiesFile(AutomatedInstallData installData,
+            PrintWriter printWriter)
+    {
+        return true;
+    }
 
-	private ProcessPanelWorker createWorker(AutomatedInstallData installData) {
-		if (installerContainer == null) throw new NullPointerException("Missing installer container");
-		noOfJobs = currentJob = 0; //reset variables
+    @Override
+    public boolean runConsoleFromProperties(AutomatedInstallData installData, Properties p)
+    {
+        return runConsole(installData);
+    }
 
-		RulesEngine rules = installerContainer.getComponent(RulesEngine.class);
-		VariableSubstitutor substitutor = installerContainer.getComponent(VariableSubstitutor.class);
-		try {
-			ProcessPanelWorker worker = new ProcessPanelWorker(installData, substitutor, rules);
-			worker.setHandler(this);
-			return worker;
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
+    @Override
+    public boolean runConsole(AutomatedInstallData installData)
+    {
+        ProcessPanelWorker worker = createWorker(installData);
+        worker.run();
+        if (!worker.getResult())
+            throw new RuntimeException("The work done by the ProcessPanel failed");
+        return true;
+    }
 
-	@Override
-	public void logOutput(String message, boolean stderr) {
-		if (stderr) System.err.println(message);
-		else System.out.println(message);
-	}
+    private ProcessPanelWorker createWorker(AutomatedInstallData installData)
+    {
+        if (installerContainer == null)
+            throw new NullPointerException("Missing installer container");
+        noOfJobs = currentJob = 0; // reset variables
 
-	@Override
-	public void startProcessing(int no_of_processes) {
-		System.out.println("[ Starting processing ]");
-		this.noOfJobs = no_of_processes;
-	}
+        RulesEngine rules = installerContainer.getComponent(RulesEngine.class);
+        VariableSubstitutor substitutor = installerContainer
+                .getComponent(VariableSubstitutor.class);
+        try
+        {
+            ProcessPanelWorker worker = new ProcessPanelWorker(installData, substitutor, rules);
+            worker.setHandler(this);
+            return worker;
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
 
-	@Override
-	public void startProcess(String name) {
-		this.currentJob++;
-		System.out.println("Starting process " + name + " (" + this.currentJob + "/" + this.noOfJobs + ")");
-	}
+    @Override
+    public void logOutput(String message, boolean stderr)
+    {
+        if (stderr)
+            System.err.println(message);
+        else
+            System.out.println(message);
+    }
 
-	@Override
-	public void finishProcess() {
-	}
+    @Override
+    public void startProcessing(int no_of_processes)
+    {
+        System.out.println("[ Starting processing ]");
+        this.noOfJobs = no_of_processes;
+    }
 
-	@Override
-	public void finishProcessing(boolean unlockPrev, boolean unlockNext) {
-		if (!unlockNext) throw new IllegalStateException("Process failed");
-		System.out.println("[ Processing finished ]");
-	}
+    @Override
+    public void startProcess(String name)
+    {
+        this.currentJob++;
+        System.out.println("Starting process " + name + " (" + this.currentJob + "/"
+                + this.noOfJobs + ")");
+    }
 
-	@Override
-	public BindeableContainer getInstallerContainer() {
-		return installerContainer;
-	}
+    @Override
+    public void finishProcess()
+    {
+    }
 
-	@Override
-	public void setInstallerContainer(BindeableContainer installerContainer) {
-		this.installerContainer = installerContainer;
-	}
+    @Override
+    public void finishProcessing(boolean unlockPrev, boolean unlockNext)
+    {
+        if (!unlockNext) throw new IllegalStateException("Process failed");
+        System.out.println("[ Processing finished ]");
+    }
+
+    @Override
+    public BindeableContainer getInstallerContainer()
+    {
+        return installerContainer;
+    }
+
+    @Override
+    public void setInstallerContainer(BindeableContainer installerContainer)
+    {
+        this.installerContainer = installerContainer;
+    }
 }

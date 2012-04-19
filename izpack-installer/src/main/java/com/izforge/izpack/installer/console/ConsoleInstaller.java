@@ -66,21 +66,26 @@ public class ConsoleInstaller extends InstallerBase
     private Properties properties;
 
     private PrintWriter printWriter;
+
     private final RulesEngine rules;
+
     private ConditionCheck checkCondition;
+
     private VariableSubstitutor variableSubstitutor;
 
-	private final BindeableContainer installerContainer;
+    private final BindeableContainer installerContainer;
 
-    public ConsoleInstaller(AutomatedInstallData installdata, RulesEngine rules, ResourceManager resourceManager, ConditionCheck checkCondition, BindeableContainer installerContainer) throws Exception
+    public ConsoleInstaller(AutomatedInstallData installdata, RulesEngine rules,
+            ResourceManager resourceManager, ConditionCheck checkCondition,
+            BindeableContainer installerContainer) throws Exception
 
     {
         super(resourceManager);
-//        super(resourceManager);
+        // super(resourceManager);
         this.checkCondition = checkCondition;
         this.installdata = installdata;
         this.rules = rules;
-		this.installerContainer = installerContainer;
+        this.installerContainer = installerContainer;
 
         // Fallback: choose the first listed language pack if not specified via commandline
         if (this.installdata.getLocaleISO3() == null)
@@ -88,9 +93,11 @@ public class ConsoleInstaller extends InstallerBase
             this.installdata.setLocaleISO3(resourceManager.getAvailableLangPacks().get(0));
         }
 
-        InputStream in = resourceManager.getInputStream("langpacks/" + this.installdata.getLocaleISO3() + ".xml");
+        InputStream in = resourceManager.getInputStream("langpacks/"
+                + this.installdata.getLocaleISO3() + ".xml");
         this.installdata.setLangpack(new LocaleDatabase(in));
-        this.installdata.setVariable(ScriptParserConstant.ISO3_LANG, this.installdata.getLocaleISO3());
+        this.installdata.setVariable(ScriptParserConstant.ISO3_LANG,
+                this.installdata.getLocaleISO3());
         resourceManager.setLocale(this.installdata.getLocaleISO3());
         if (!checkCondition.checkInstallerRequirements(this))
         {
@@ -116,8 +123,9 @@ public class ConsoleInstaller extends InstallerBase
         }
         Debug.log("[ Starting console installation ] " + strAction);
 
-        VariableSubstitutorImpl substitutor = new VariableSubstitutorImpl(this.installdata.getVariables());
-		refreshDynamicVariables(this.installdata, substitutor);
+        VariableSubstitutorImpl substitutor = new VariableSubstitutorImpl(
+                this.installdata.getVariables());
+        refreshDynamicVariables(this.installdata, substitutor);
         try
         {
             this.result = true;
@@ -133,10 +141,10 @@ public class ConsoleInstaller extends InstallerBase
 
                 PanelConsole consoleHelperInstance = getPanelConsoleHelper(panel);
 
-                //Check to see if we can show the panel based on its conditions.
+                // Check to see if we can show the panel based on its conditions.
                 if ((consoleHelperInstance != null) && (canShow(panel)))
                 {
-                	String consoleHelperClassName = consoleHelperInstance.getClass().getName();
+                    String consoleHelperClassName = consoleHelperInstance.getClass().getName();
                     try
                     {
                         Debug.log("consoleHelperInstance." + strAction + ":"
@@ -147,8 +155,7 @@ public class ConsoleInstaller extends InstallerBase
                         if (strCondition != null)
                         {
                             RulesEngine rules = installdata.getRules();
-                            bIsConditionFulfilled = rules.isConditionTrue(
-                                    strCondition);
+                            bIsConditionFulfilled = rules.isConditionTrue(strCondition);
                         }
 
                         if (strAction.equals("doInstall") && bIsConditionFulfilled)
@@ -220,22 +227,22 @@ public class ConsoleInstaller extends InstallerBase
 
     }
 
-    private PanelConsole getPanelConsoleHelper(Panel panel) {
+    private PanelConsole getPanelConsoleHelper(Panel panel)
+    {
         String prefix = "com.izforge.izpack.panels.";
         if (panel.className.contains("."))
         {
             prefix = "";
         }
 
-    	String panelClassName = panel.className;
+        String panelClassName = panel.className;
         String consoleHelperClassName = prefix + panelClassName + "ConsoleHelper";
         Class<PanelConsole> consoleHelperClass = null;
 
         Debug.log("ConsoleHelper:" + consoleHelperClassName);
         try
         {
-            consoleHelperClass = (Class<PanelConsole>) Class
-                    .forName(consoleHelperClassName);
+            consoleHelperClass = (Class<PanelConsole>) Class.forName(consoleHelperClassName);
         }
         catch (ClassNotFoundException e)
         {
@@ -257,13 +264,15 @@ public class ConsoleInstaller extends InstallerBase
             }
         }
 
-        if (consoleHelperInstance instanceof HasInstallerContainer) {
-        	((HasInstallerContainer) consoleHelperInstance).setInstallerContainer(installerContainer);
+        if (consoleHelperInstance instanceof HasInstallerContainer)
+        {
+            ((HasInstallerContainer) consoleHelperInstance)
+                    .setInstallerContainer(installerContainer);
         }
         return consoleHelperInstance;
-	}
+    }
 
-	protected void doInstall() throws Exception
+    protected void doInstall() throws Exception
     {
         try
         {
@@ -337,7 +346,6 @@ public class ConsoleInstaller extends InstallerBase
         }
     }
 
-
     /**
      * Method checks whether conditions are met to show the given panel.
      *
@@ -370,20 +378,19 @@ public class ConsoleInstaller extends InstallerBase
         }
     }
 
-
     /**
      * Validate a panel.
      *
      * @param p The panel to validate
-     * @return The status of the validation - false makes the installation fail
-     *         thrown if the validation fails.
+     * @return The status of the validation - false makes the installation fail thrown if the
+     * validation fails.
      */
     private boolean validatePanel(final Panel p) throws InstallerException
     {
         try
         {
-            InstallerBase.refreshDynamicVariables(installdata,
-                    new VariableSubstitutorImpl(this.installdata.getVariables()));
+            InstallerBase.refreshDynamicVariables(installdata, new VariableSubstitutorImpl(
+                    this.installdata.getVariables()));
         }
         catch (Exception e)
         {
@@ -391,7 +398,8 @@ public class ConsoleInstaller extends InstallerBase
         }
 
         // Evaluate all global dynamic conditions
-        List<DynamicInstallerRequirementValidator> dynConds = installdata.getDynamicinstallerrequirements();
+        List<DynamicInstallerRequirementValidator> dynConds = installdata
+                .getDynamicinstallerrequirements();
         if (dynConds != null)
         {
             for (DynamicInstallerRequirementValidator validator : dynConds)
@@ -402,9 +410,11 @@ public class ConsoleInstaller extends InstallerBase
                     String errorMessage;
                     try
                     {
-                        errorMessage = installdata.getLangpack().getString("data.validation.error.title")
-                                + ": " + variableSubstitutor.substitute(installdata.getLangpack().getString(validator
-                                .getErrorMessageId()));
+                        errorMessage = installdata.getLangpack().getString(
+                                "data.validation.error.title")
+                                + ": "
+                                + variableSubstitutor.substitute(installdata.getLangpack()
+                                        .getString(validator.getErrorMessageId()));
                     }
                     catch (Exception e)
                     {
@@ -457,9 +467,8 @@ public class ConsoleInstaller extends InstallerBase
             String oldval = (String) properties.setProperty(key, newval);
             if (oldval != null)
             {
-                System.out.println(
-                        "Warning: Property " + key + " overwritten: '"
-                                + oldval + "' --> '" + newval + "'");
+                System.out.println("Warning: Property " + key + " overwritten: '" + oldval
+                        + "' --> '" + newval + "'");
             }
         }
     }
@@ -473,8 +482,8 @@ public class ConsoleInstaller extends InstallerBase
             System.out.println("[ There are file operations pending after reboot ]");
             switch (installdata.getInfo().getRebootAction())
             {
-                case Info.REBOOT_ACTION_ALWAYS:
-                    reboot = true;
+            case Info.REBOOT_ACTION_ALWAYS:
+                reboot = true;
             }
             if (reboot)
             {
@@ -488,24 +497,24 @@ public class ConsoleInstaller extends InstallerBase
     {
         switch (type)
         {
-            case Installer.CONSOLE_GEN_TEMPLATE:
-                doGeneratePropertiesFile(path);
-                break;
+        case Installer.CONSOLE_GEN_TEMPLATE:
+            doGeneratePropertiesFile(path);
+            break;
 
-            case Installer.CONSOLE_FROM_TEMPLATE:
-                doInstallFromPropertiesFile(path);
-                break;
+        case Installer.CONSOLE_FROM_TEMPLATE:
+            doInstallFromPropertiesFile(path);
+            break;
 
-            case Installer.CONSOLE_FROM_SYSTEMPROPERTIES:
-                doInstallFromSystemProperties();
-                break;
+        case Installer.CONSOLE_FROM_SYSTEMPROPERTIES:
+            doInstallFromSystemProperties();
+            break;
 
-            case Installer.CONSOLE_FROM_SYSTEMPROPERTIESMERGE:
-                doInstallFromSystemPropertiesMerge(path);
-                break;
+        case Installer.CONSOLE_FROM_SYSTEMPROPERTIESMERGE:
+            doInstallFromSystemPropertiesMerge(path);
+            break;
 
-            default:
-                doInstall();
+        default:
+            doInstall();
         }
     }
 

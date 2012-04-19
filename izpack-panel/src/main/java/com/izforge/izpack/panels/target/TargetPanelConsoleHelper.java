@@ -40,7 +40,9 @@ import com.izforge.izpack.panels.path.PathInputPanel;
  */
 public class TargetPanelConsoleHelper extends PanelConsoleHelper implements PanelConsole
 {
-    public boolean runGeneratePropertiesFile(AutomatedInstallData installData, PrintWriter printWriter)
+
+    public boolean runGeneratePropertiesFile(AutomatedInstallData installData,
+            PrintWriter printWriter)
     {
         printWriter.println(AutomatedInstallData.INSTALL_PATH + "=");
         return true;
@@ -73,8 +75,8 @@ public class TargetPanelConsoleHelper extends PanelConsoleHelper implements Pane
     {
 
         ResourceManager resourceManager = ResourceManager.getInstance();
-        String strDefaultPath = PathInputPanel.loadDefaultInstallDir(
-                resourceManager, getVariableSubstitutor(idata), idata);
+        String strDefaultPath = PathInputPanel.loadDefaultInstallDir(resourceManager,
+                getVariableSubstitutor(idata), idata);
 
         String strTargetPath = "";
 

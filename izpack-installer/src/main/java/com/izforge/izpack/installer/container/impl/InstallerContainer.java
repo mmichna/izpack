@@ -48,27 +48,19 @@ public class InstallerContainer extends AbstractContainer
     {
         this.pico = pico;
         pico
-//              .addAdapter(new ProviderAdapter(new AutomatedInstallDataProvider()))
-                .addAdapter(new ProviderAdapter(new GUIInstallDataProvider()))
+        // .addAdapter(new ProviderAdapter(new AutomatedInstallDataProvider()))
+        .addAdapter(new ProviderAdapter(new GUIInstallDataProvider()))
                 .addAdapter(new ProviderAdapter(new IconsProvider()))
-                .addAdapter(new ProviderAdapter(new RulesProvider()))
-                ;
-        pico
-                .addComponent(PanelManager.class)
-                .addComponent(InstallDataConfiguratorWithRules.class)
-                .addComponent(ConditionCheck.class)
-                .addComponent(InstallerController.class)
-                .addComponent(MergeManagerImpl.class)
-                .addComponent(UninstallData.class)
+                .addAdapter(new ProviderAdapter(new RulesProvider()));
+        pico.addComponent(PanelManager.class).addComponent(InstallDataConfiguratorWithRules.class)
+                .addComponent(ConditionCheck.class).addComponent(InstallerController.class)
+                .addComponent(MergeManagerImpl.class).addComponent(UninstallData.class)
                 .addComponent(MutablePicoContainer.class, pico)
                 .addComponent(ConditionContainer.class)
                 .addComponent(VariableSubstitutor.class, VariableSubstitutorImpl.class)
-                .addComponent(Properties.class)
-                .addComponent(ResourceManager.class)
-                .addComponent(ConsoleInstaller.class)
-                .addComponent(UninstallDataWriter.class)
-                .addComponent(AutomatedInstaller.class)
-                .addComponent(EventFiller.class)
+                .addComponent(Properties.class).addComponent(ResourceManager.class)
+                .addComponent(ConsoleInstaller.class).addComponent(UninstallDataWriter.class)
+                .addComponent(AutomatedInstaller.class).addComponent(EventFiller.class)
                 .addComponent(BindeableContainer.class, this);
 
         new ResolverContainerFiller().fillContainer(pico);
@@ -86,24 +78,22 @@ public class InstallerContainer extends AbstractContainer
             throw new IzPackException(e);
         }
         pico
-                // Configuration of title parameter in InstallerFrame
-                .addConfig("title", getTitle(installdata, substitutor));
+        // Configuration of title parameter in InstallerFrame
+        .addConfig("title", getTitle(installdata, substitutor));
 
         String headless = System.getProperty("java.awt.headless");
-		if (headless == null || headless.equals("false")) {
-			// Configuration of frame parameter in languageDialog
-			pico.addConfig("frame", initFrame());
+        if (headless == null || headless.equals("false"))
+        {
+            // Configuration of frame parameter in languageDialog
+            pico.addConfig("frame", initFrame());
         }
 
-        pico
-                .addComponent(IUnpacker.class, unpackerclass)
-                .addComponent(InstallerFrame.class)
+        pico.addComponent(IUnpacker.class, unpackerclass).addComponent(InstallerFrame.class)
                 .as(Characteristics.USE_NAMES).addComponent(LanguageDialog.class);
 
         // Load custom data in last position
         pico.getComponent(EventFiller.class).loadCustomData();
     }
-
 
     private JFrame initFrame()
     {
@@ -111,7 +101,8 @@ public class InstallerContainer extends AbstractContainer
         // Dummy Frame
         JFrame frame = new JFrame();
         ImageIcon imageIcon;
-        imageIcon = resourceManager.getImageIconResource("JFrameIcon", "/com/izforge/izpack/img/JFrameIcon.png");
+        imageIcon = resourceManager.getImageIconResource("JFrameIcon",
+                "/com/izforge/izpack/img/JFrameIcon.png");
         frame.setIconImage(imageIcon.getImage());
 
         Dimension frameSize = frame.getSize();
@@ -134,7 +125,7 @@ public class InstallerContainer extends AbstractContainer
         }
         else
         { // Attention! The alternate message has to contain the whole message including
-            // $APP_NAME and may be $APP_VER.
+          // $APP_NAME and may be $APP_VER.
             try
             {
                 return vs.substitute(message);
@@ -147,10 +138,11 @@ public class InstallerContainer extends AbstractContainer
         return message;
     }
 
-    public interface HasInstallerContainer {
+    public interface HasInstallerContainer
+    {
 
-    	BindeableContainer getInstallerContainer();
+        BindeableContainer getInstallerContainer();
 
-    	void setInstallerContainer(BindeableContainer installerContainer);
+        void setInstallerContainer(BindeableContainer installerContainer);
     }
 }

@@ -38,86 +38,110 @@ import com.izforge.izpack.util.Housekeeper;
  * @see PanelAutomationHelper
  * @author Mounir El Hajj
  */
-abstract public class PanelConsoleHelper implements AbstractUIHandler {
+abstract public class PanelConsoleHelper implements AbstractUIHandler
+{
 
-	private VariableSubstitutor variableSubstitutor;
+    private VariableSubstitutor variableSubstitutor;
 
-	public int askEndOfConsolePanel() {
-		try {
-			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-			while (true) {
-				System.out.println("press 1 to continue, 2 to quit, 3 to redisplay");
-				String strIn = br.readLine();
-				if (strIn.equals("1")) {
-					return 1;
-				} else if (strIn.equals("2")) {
-					return 2;
-				} else if (strIn.equals("3")) {
-					return 3;
-				} else if (strIn.equals("3")) {
-					return 3;
-				}
-			}
+    public int askEndOfConsolePanel()
+    {
+        try
+        {
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            while (true)
+            {
+                System.out.println("press 1 to continue, 2 to quit, 3 to redisplay");
+                String strIn = br.readLine();
+                if (strIn.equals("1"))
+                {
+                    return 1;
+                }
+                else if (strIn.equals("2"))
+                {
+                    return 2;
+                }
+                else if (strIn.equals("3"))
+                {
+                    return 3;
+                }
+                else if (strIn.equals("3")) { return 3; }
+            }
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return 2;
-	}
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        return 2;
+    }
 
-	protected final VariableSubstitutor getVariableSubstitutor(AutomatedInstallData installData) {
-		if (variableSubstitutor == null) variableSubstitutor = new VariableSubstitutorImpl(installData.getVariables());
-		return variableSubstitutor;
-	}
+    protected final VariableSubstitutor getVariableSubstitutor(AutomatedInstallData installData)
+    {
+        if (variableSubstitutor == null)
+            variableSubstitutor = new VariableSubstitutorImpl(installData.getVariables());
+        return variableSubstitutor;
+    }
 
-	/**
-	 * @see com.izforge.izpack.api.handler.AbstractUIHandler#emitNotification(java.lang.String)
-	 */
-	public void emitNotification(String message) {
-		System.out.println(message);
-	}
+    /**
+     * @see com.izforge.izpack.api.handler.AbstractUIHandler#emitNotification(java.lang.String)
+     */
+    public void emitNotification(String message)
+    {
+        System.out.println(message);
+    }
 
-	/**
-	 * @see com.izforge.izpack.api.handler.AbstractUIHandler#emitWarning(java.lang.String, java.lang.String)
-	 */
-	public boolean emitWarning(String title, String message) {
-		System.err.println("[ WARNING: " + formatTitle(title) + message + " ]");
-		// default: continue
-		return true;
-	}
+    /**
+     * @see com.izforge.izpack.api.handler.AbstractUIHandler#emitWarning(java.lang.String,
+     * java.lang.String)
+     */
+    public boolean emitWarning(String title, String message)
+    {
+        System.err.println("[ WARNING: " + formatTitle(title) + message + " ]");
+        // default: continue
+        return true;
+    }
 
-	/**
-	 * @see com.izforge.izpack.api.handler.AbstractUIHandler#emitError(java.lang.String, java.lang.String)
-	 */
-	public void emitError(String title, String message) {
-		System.err.println("[ ERROR: " + formatTitle(title) + message + " ]");
-	}
+    /**
+     * @see com.izforge.izpack.api.handler.AbstractUIHandler#emitError(java.lang.String,
+     * java.lang.String)
+     */
+    public void emitError(String title, String message)
+    {
+        System.err.println("[ ERROR: " + formatTitle(title) + message + " ]");
+    }
 
-	private String formatTitle(String title) {
-		if (title == null || title.isEmpty()) return "";
-		return title + ": ";
-	}
+    private String formatTitle(String title)
+    {
+        if (title == null || title.isEmpty()) return "";
+        return title + ": ";
+    }
 
-	/**
-	 * @see com.izforge.izpack.api.handler.AbstractUIHandler#emitErrorAndBlockNext(java.lang.String, java.lang.String)
-	 */
-	public void emitErrorAndBlockNext(String title, String message) {
-		emitError(title, message);
-		Housekeeper.getInstance().shutDown(10);
-	}
+    /**
+     * @see com.izforge.izpack.api.handler.AbstractUIHandler#emitErrorAndBlockNext(java.lang.String,
+     * java.lang.String)
+     */
+    public void emitErrorAndBlockNext(String title, String message)
+    {
+        emitError(title, message);
+        Housekeeper.getInstance().shutDown(10);
+    }
 
-	/**
-	 * @see com.izforge.izpack.api.handler.AbstractUIHandler#askQuestion(java.lang.String, java.lang.String, int)
-	 */
-	public int askQuestion(String title, String question, int choices) {
-		// don't know what to answer
-		return AbstractUIHandler.ANSWER_CANCEL;
-	}
+    /**
+     * @see com.izforge.izpack.api.handler.AbstractUIHandler#askQuestion(java.lang.String,
+     * java.lang.String, int)
+     */
+    public int askQuestion(String title, String question, int choices)
+    {
+        // don't know what to answer
+        return AbstractUIHandler.ANSWER_CANCEL;
+    }
 
-	/**
-	 * @see com.izforge.izpack.api.handler.AbstractUIHandler#askQuestion(java.lang.String, java.lang.String, int, int)
-	 */
-	public int askQuestion(String title, String question, int choices, int default_choice) {
-		return default_choice;
-	}
+    /**
+     * @see com.izforge.izpack.api.handler.AbstractUIHandler#askQuestion(java.lang.String,
+     * java.lang.String, int, int)
+     */
+    public int askQuestion(String title, String question, int choices, int default_choice)
+    {
+        return default_choice;
+    }
 }

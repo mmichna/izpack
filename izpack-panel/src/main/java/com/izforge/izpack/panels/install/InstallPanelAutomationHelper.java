@@ -36,107 +36,123 @@ import com.izforge.izpack.installer.unpacker.IUnpacker;
  *
  * @author Jonathan Halliday
  */
-public class InstallPanelAutomationHelper extends PanelAutomationHelper implements PanelAutomation, AbstractUIProgressHandler, HasInstallerContainer {
+public class InstallPanelAutomationHelper extends PanelAutomationHelper implements PanelAutomation,
+        AbstractUIProgressHandler, HasInstallerContainer
+{
 
-	private BindeableContainer installerContainer;
-	private int noOfPacks = 0;
+    private BindeableContainer installerContainer;
 
-	/**
-	 * Null op - this panel type has no state to serialize.
-	 *
-	 * @param installData unused.
-	 * @param panelRoot   unused.
-	 */
-	public void makeXMLData(AutomatedInstallData installData, IXMLElement panelRoot) {
-		// do nothing.
-	}
+    private int noOfPacks = 0;
 
-	/**
-	 * Perform the installation actions.
-	 *
-	 * @param panelRoot The panel XML tree root.
-	 * @return true if the installation was successful.
-	 */
-	public void runAutomated(AutomatedInstallData idata, IXMLElement panelRoot) throws InstallerException {
-		IUnpacker unpacker = installerContainer.getComponent(IUnpacker.class);
-		unpacker.setHandler(this);
-		Thread unpackerthread = new Thread(unpacker, "IzPack - Unpacker thread");
-		unpacker.setRules(idata.getRules());
-		unpackerthread.start();
-		while (unpackerthread.isAlive()) {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				// ignore it, we're waiting for the unpacker to finish...
-			}
-		}
-		if (!unpacker.getResult()) {
-			throw new InstallerException("Unpack failed (xml line " + panelRoot.getLineNr() + ")");
-		}
-	}
+    /**
+     * Null op - this panel type has no state to serialize.
+     *
+     * @param installData unused.
+     * @param panelRoot unused.
+     */
+    public void makeXMLData(AutomatedInstallData installData, IXMLElement panelRoot)
+    {
+        // do nothing.
+    }
 
-	/**
-	 * Reports progress on System.out
-	 *
-	 * @see AbstractUIProgressHandler#startAction(String, int)
-	 */
-	public void startAction(String name, int no_of_steps) {
-		System.out.println("[ Starting to unpack ]");
-		this.noOfPacks = no_of_steps;
-	}
+    /**
+     * Perform the installation actions.
+     *
+     * @param panelRoot The panel XML tree root.
+     * @return true if the installation was successful.
+     */
+    public void runAutomated(AutomatedInstallData idata, IXMLElement panelRoot)
+            throws InstallerException
+    {
+        IUnpacker unpacker = installerContainer.getComponent(IUnpacker.class);
+        unpacker.setHandler(this);
+        Thread unpackerthread = new Thread(unpacker, "IzPack - Unpacker thread");
+        unpacker.setRules(idata.getRules());
+        unpackerthread.start();
+        while (unpackerthread.isAlive())
+        {
+            try
+            {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e)
+            {
+                // ignore it, we're waiting for the unpacker to finish...
+            }
+        }
+        if (!unpacker.getResult()) { throw new InstallerException("Unpack failed (xml line "
+                + panelRoot.getLineNr() + ")"); }
+    }
 
-	/**
-	 * Sets state variable for thread sync.
-	 *
-	 * @see com.izforge.izpack.api.handler.AbstractUIProgressHandler#stopAction()
-	 */
-	public void stopAction() {
-		System.out.println("[ Unpacking finished ]");
-		boolean done = true;
-	}
+    /**
+     * Reports progress on System.out
+     *
+     * @see AbstractUIProgressHandler#startAction(String, int)
+     */
+    public void startAction(String name, int no_of_steps)
+    {
+        System.out.println("[ Starting to unpack ]");
+        this.noOfPacks = no_of_steps;
+    }
 
-	/**
-	 * Null op.
-	 *
-	 * @param val
-	 * @param msg
-	 * @see com.izforge.izpack.api.handler.AbstractUIProgressHandler#progress(int, String)
-	 */
-	public void progress(int val, String msg) {
-		// silent for now. should log individual files here, if we had a verbose
-		// mode?
-	}
+    /**
+     * Sets state variable for thread sync.
+     *
+     * @see com.izforge.izpack.api.handler.AbstractUIProgressHandler#stopAction()
+     */
+    public void stopAction()
+    {
+        System.out.println("[ Unpacking finished ]");
+        boolean done = true;
+    }
 
-	/**
-	 * Reports progress to System.out
-	 *
-	 * @param packName The currently installing pack.
-	 * @param stepno   The number of the pack
-	 * @param stepsize unused
-	 * @see com.izforge.izpack.api.handler.AbstractUIProgressHandler#nextStep(String, int, int)
-	 */
-	public void nextStep(String packName, int stepno, int stepsize) {
-		System.out.print("[ Processing package: " + packName + " (");
-		System.out.print(stepno);
-		System.out.print('/');
-		System.out.print(this.noOfPacks);
-		System.out.println(") ]");
-	}
+    /**
+     * Null op.
+     *
+     * @param val
+     * @param msg
+     * @see com.izforge.izpack.api.handler.AbstractUIProgressHandler#progress(int, String)
+     */
+    public void progress(int val, String msg)
+    {
+        // silent for now. should log individual files here, if we had a verbose
+        // mode?
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void setSubStepNo(int no_of_substeps) {
-		// not used here
-	}
+    /**
+     * Reports progress to System.out
+     *
+     * @param packName The currently installing pack.
+     * @param stepno The number of the pack
+     * @param stepsize unused
+     * @see com.izforge.izpack.api.handler.AbstractUIProgressHandler#nextStep(String, int, int)
+     */
+    public void nextStep(String packName, int stepno, int stepsize)
+    {
+        System.out.print("[ Processing package: " + packName + " (");
+        System.out.print(stepno);
+        System.out.print('/');
+        System.out.print(this.noOfPacks);
+        System.out.println(") ]");
+    }
 
-	@Override
-	public BindeableContainer getInstallerContainer() {
-		return installerContainer;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public void setSubStepNo(int no_of_substeps)
+    {
+        // not used here
+    }
 
-	@Override
-	public void setInstallerContainer(BindeableContainer installerContainer) {
-		this.installerContainer = installerContainer;
-	}
+    @Override
+    public BindeableContainer getInstallerContainer()
+    {
+        return installerContainer;
+    }
+
+    @Override
+    public void setInstallerContainer(BindeableContainer installerContainer)
+    {
+        this.installerContainer = installerContainer;
+    }
 }
